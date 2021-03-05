@@ -1,0 +1,143 @@
+{{ header }}
+<style>
+  .text-bold {
+    font-weight: bold;
+  }
+  .displayed-module {
+    border: 1px solid #dadada;
+    padding: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 5px;
+  }
+  .displayed-module-name {
+    margin-left: 10px;
+  }
+  .displayed-module-close {
+    cursor: pointer;
+  }
+</style>
+{{ column_left }}
+<div id="content">
+  <div class="page-header">
+    <div class="container-fluid">
+      <div class="pull-right">
+        <button type="submit" form="form-module" data-toggle="tooltip" title="{{ button_save }}" class="btn btn-primary"><i class="fa fa-save"></i></button>
+        <a href="{{ cancel }}" data-toggle="tooltip" title="{{ button_cancel }}" class="btn btn-default"><i class="fa fa-reply"></i></a></div>
+      <h1>{{ heading_title }}</h1>
+      <ul class="breadcrumb">
+        {% for breadcrumb in breadcrumbs %}
+        <li><a href="{{ breadcrumb.href }}">{{ breadcrumb.text }}</a></li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+  <div class="container-fluid">
+    {% if error_warning %}
+    <div class="alert alert-danger alert-dismissible"><i class="fa fa-exclamation-circle"></i> {{ error_warning }}
+      <button type="button" class="close" data-dismiss="alert">&times;</button>
+    </div>
+    {% endif %}
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <h3 class="panel-title"><i class="fa fa-pencil"></i> {{ text_edit }}</h3>
+      </div>
+      <div class="panel-body">
+        <form action="{{ action }}" method="post" enctype="multipart/form-data" id="form-module" class="form-horizontal">
+          <div class="form-group">
+            <label class="col-sm-2 control-label" for="input-name">{{ entry_name }}</label>
+            <div class="col-sm-10">
+              <input type="text" name="module_cart_popup_name" value="{{ module_cart_popup_name }}" placeholder="{{ entry_name }}" id="input-name" class="form-control" />
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="col-sm-2 control-label" for="input-display-heading">{{ entry_display_heading }}</label>
+            <div class="col-sm-10">
+              <select name="module_cart_popup_display_heading" id="input-display-heading" class="form-control">
+                {% if module_cart_popup_display_heading %}
+                  <option value="1" selected="selected">{{ text_yes }}</option>
+                  <option value="0">{{ text_no }}</option>
+                {% else %}
+                  <option value="1">{{ text_yes }}</option>
+                  <option value="0" selected="selected">{{ text_no }}</option>
+                {% endif %}
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="col-sm-2 control-label" for="input-button-class">{{ entry_button_class }}</label>
+            <div class="col-sm-10">
+              <input type="text" name="module_cart_popup_button_class" value="{{ module_cart_popup_button_class }}" placeholder="{{ entry_button_class }}" id="input-button-class" class="form-control" />
+            </div>
+          </div>
+          <div class="form-group" id="categories-row">
+            <label class="col-sm-2 control-label" for="select-modules">{{ entry_modules }}</label>
+            <div class="col-sm-10">
+              <select name="modules" id="select-modules" class="form-control">
+                <option selected="selected" disabled="disabled">{{ text_modules }}</option>
+                {% for extension in extensions if extension.installed %}
+                  <option {% if extension.module %} disabled="disabled" class="text-bold" {% endif %} value="{{ extension.code }}">
+                    {{ extension.name }}
+                  </option>
+                  {% for module in extension.module %}
+                    <option value="{{ module.module_id }}">
+                      {{ module.name }}
+                    </option>
+                  {% endfor %}
+                {% endfor %}
+              </select>
+              <br>
+              <div id="displayed_modules" class="well well-sm" style="height: fit-content; overflow: auto; min-height: 150px;">
+                {% for module_cart_popup_displayed_module in module_cart_popup_displayed_modules %}
+                  <div class="displayed-module" id="displayed-module_{{ module_cart_popup_displayed_module.code }}">
+                    <div class="displayed-module-leftside">
+                      <span class="displayed-module-name">{{ module_cart_popup_displayed_module.name }}</span>
+                    </div>
+                    <input type="hidden" name="module_cart_popup_displayed_modules[]" value="{{ module_cart_popup_displayed_module.code }}" />
+                    <span class="displayed-module-close"><i class="fa fa-close"></i></span>
+                  </div>
+                {% endfor %}
+              </div>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="col-sm-2 control-label" for="input-status">{{ entry_status }}</label>
+            <div class="col-sm-10">
+              <select name="module_cart_popup_status" id="input-status" class="form-control">
+                {% if module_cart_popup_status %}
+                  <option value="1" selected="selected">{{ text_enabled }}</option>
+                  <option value="0">{{ text_disabled }}</option>
+                {% else %}
+                  <option value="1">{{ text_enabled }}</option>
+                  <option value="0" selected="selected">{{ text_disabled }}</option>
+                {% endif %}
+              </select>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  <script>
+      $('#displayed_modules').delegate('.displayed-module-close', 'click', function() {
+          $(this).parent().remove();
+      });
+      $('#select-modules').on('change', function() {
+          let moduleCode = $(this).find('option:selected').val().trim();
+          let moduleName = $(this).find('option:selected').text().trim()
+          if (moduleCode) {
+              $('#displayed_module_' + moduleCode).remove();
+              $('#displayed_modules').append(
+                  '<div class="displayed-module" id="displayed-module_' + moduleCode + '">\n' +
+                    '<div class="displayed-module-leftside">\n' +
+                      '<span class="displayed-module-name">' + moduleName + '</span>\n' +
+                    '</div>\n' +
+                    '<input type="hidden" name="module_cart_popup_displayed_modules[]" value="' + moduleCode + '" />\n' +
+                    '<span class="displayed-module-close"><i class="fa fa-close"></i></span>\n' +
+                  '</div>');
+          }
+      })
+  </script>
+</div>
+{{ footer }}
