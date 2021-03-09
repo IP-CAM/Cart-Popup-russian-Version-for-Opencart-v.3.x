@@ -48,14 +48,14 @@
           <div class="form-group">
             <label class="col-sm-2 control-label" for="input-name">{{ entry_name }}</label>
             <div class="col-sm-10">
-              <input type="text" name="module_cart_popup_name" value="{{ module_cart_popup_name }}" placeholder="{{ entry_name }}" id="input-name" class="form-control" />
+              <input type="text" name="module_cart_popup_nik_name" value="{{ module_cart_popup_nik_name }}" placeholder="{{ entry_name }}" id="input-name" class="form-control" />
             </div>
           </div>
           <div class="form-group">
             <label class="col-sm-2 control-label" for="input-display-heading">{{ entry_display_heading }}</label>
             <div class="col-sm-10">
-              <select name="module_cart_popup_display_heading" id="input-display-heading" class="form-control">
-                {% if module_cart_popup_display_heading %}
+              <select name="module_cart_popup_nik_display_heading" id="input-display-heading" class="form-control">
+                {% if module_cart_popup_nik_display_heading %}
                   <option value="1" selected="selected">{{ text_yes }}</option>
                   <option value="0">{{ text_no }}</option>
                 {% else %}
@@ -68,7 +68,7 @@
           <div class="form-group">
             <label class="col-sm-2 control-label" for="input-button-class">{{ entry_button_class }}</label>
             <div class="col-sm-10">
-              <input type="text" name="module_cart_popup_button_class" value="{{ module_cart_popup_button_class }}" placeholder="{{ entry_button_class }}" id="input-button-class" class="form-control" />
+              <input type="text" name="module_cart_popup_nik_button_class" value="{{ module_cart_popup_nik_button_class }}" placeholder="{{ entry_button_class }}" id="input-button-class" class="form-control" />
             </div>
           </div>
           <div class="form-group" id="categories-row">
@@ -76,12 +76,12 @@
             <div class="col-sm-10">
               <select name="modules" id="select-modules" class="form-control">
                 <option selected="selected" disabled="disabled">{{ text_modules }}</option>
-                {% for extension in extensions if extension.installed %}
+                {% for extension in extensions %}
                   <option {% if extension.module %} disabled="disabled" class="text-bold" {% endif %} value="{{ extension.code }}">
                     {{ extension.name }}
                   </option>
                   {% for module in extension.module %}
-                    <option value="{{ module.module_id }}">
+                    <option value="{{ module.code }}">
                       {{ module.name }}
                     </option>
                   {% endfor %}
@@ -89,12 +89,12 @@
               </select>
               <br>
               <div id="displayed_modules" class="well well-sm" style="height: fit-content; overflow: auto; min-height: 150px;">
-                {% for module_cart_popup_displayed_module in module_cart_popup_displayed_modules %}
-                  <div class="displayed-module" id="displayed-module_{{ module_cart_popup_displayed_module.code }}">
+                {% for module_cart_popup_nik_displayed_module in module_cart_popup_nik_displayed_modules %}
+                  <div class="displayed-module" id="displayed-module_{{ module_cart_popup_nik_displayed_module.code }}">
                     <div class="displayed-module-leftside">
-                      <span class="displayed-module-name">{{ module_cart_popup_displayed_module.name }}</span>
+                      <span class="displayed-module-name">{{ module_cart_popup_nik_displayed_module.name }}</span>
                     </div>
-                    <input type="hidden" name="module_cart_popup_displayed_modules[]" value="{{ module_cart_popup_displayed_module.code }}" />
+                    <input type="hidden" name="module_cart_popup_nik_displayed_modules[]" value="{{ module_cart_popup_nik_displayed_module.code }}" />
                     <span class="displayed-module-close"><i class="fa fa-close"></i></span>
                   </div>
                 {% endfor %}
@@ -104,8 +104,8 @@
           <div class="form-group">
             <label class="col-sm-2 control-label" for="input-status">{{ entry_status }}</label>
             <div class="col-sm-10">
-              <select name="module_cart_popup_status" id="input-status" class="form-control">
-                {% if module_cart_popup_status %}
+              <select name="module_cart_popup_nik_status" id="input-status" class="form-control">
+                {% if module_cart_popup_nik_status %}
                   <option value="1" selected="selected">{{ text_enabled }}</option>
                   <option value="0">{{ text_disabled }}</option>
                 {% else %}
@@ -133,7 +133,7 @@
                     '<div class="displayed-module-leftside">\n' +
                       '<span class="displayed-module-name">' + moduleName + '</span>\n' +
                     '</div>\n' +
-                    '<input type="hidden" name="module_cart_popup_displayed_modules[]" value="' + moduleCode + '" />\n' +
+                    '<input type="hidden" name="module_cart_popup_nik_displayed_modules[]" value="' + moduleCode + '" />\n' +
                     '<span class="displayed-module-close"><i class="fa fa-close"></i></span>\n' +
                   '</div>');
           }
