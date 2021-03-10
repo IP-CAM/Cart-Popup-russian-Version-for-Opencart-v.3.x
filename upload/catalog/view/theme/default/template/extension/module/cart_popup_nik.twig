@@ -1,277 +1,336 @@
-<style>
-  .cart-popup {
-    position: fixed;
-    top: 0;
-    right: -350px;
-    width: 350px;
-    z-index: 999;
-    transition: right .2s;
-    height: 100vh;
-    padding: 0;
-  }
-  .cart-popup.show {
-    right: 0;
-    transition: right .2s;
-  }
-  .cart-popup .panel-heading {
-    display: flex;
-    justify-content: space-between;
-  }
-  .cart-popup .cart-popup-close {
-    cursor: pointer;
-  }
-  .cart-popup .panel-body {
-    padding: 0;
-    height: 100%;
-  }
-  .panel-body-inner {
-    overflow-y: auto;
-    height: 80%;
-  }
-  .cart-popup-summary-info {
-    background-color: #FCF4F2;
-    width: 100%;
-    height: max-content;
-    padding: 10px 20px;
-  }
-  .cart-popup-summary-info__cost {
-    display: flex;
-    justify-content: space-between;
-  }
-  .cart-popup-summary-info__text {
-    margin: 10px 0;
-    font-size: 11px;
-  }
-  .cart-popup p {
-    margin: 0;
-    padding: 0;
-  }
-  .cart-popup a {
-    text-decoration: none;
-    color: inherit;
-  }
-  .cart-popup-product-row {
-    display: flex;
-    justify-content: space-around;
-    padding: 20px;
-    border-bottom: 1px solid #e3e3e3;
-  }
-  .cart-popup-product-row:last-child {
-    border-bottom: none;
-  }
-  .cart-popup .cart-popup-product-image {
-    margin-right: 15px;
-    padding: 0;
-  }
-  .cart-popup .cart-popup-product-info {
-    display: flex;
-    flex-direction: column;
-    width: fit-content;
-    padding: 0;
-  }
-  .cart-popup .weight {
-    color: gray;
-    font-size: 11px;
-  }
-  .cart-popup .price .current-price {
-    font-weight: bold;
-  }
-  .cart-popup .price .old-price {
-    color: gray;
-    text-decoration: line-through;
-  }
-  .cart-popup .cart-popup-product-buttons {
-    display: flex;
-    flex-direction: row;
-    align-items: start;
-    padding: 0;
-  }
-  .cart-popup .cart-popup-product-buttons .counts {
-    width: 40px;
-    margin-right: 10px;
-  }
-  .cart-popup .cart-popup-footer {
-    width: 100%;
-    bottom: 0;
-    position: absolute;
-    z-index: 9999;
-    padding: 10px 20px;
-  }
-  .cart-popup .cart-popup-footer .cart-popup-footer-warning {
-    font-size: 11px;
-    border-bottom: 1px solid gray;
-    padding: 5px 5px 10px;
-  }
-  .cart-popup .cart-popup-footer .cart-popup-footer-info {
-    margin: 10px 0;
-    display: flex;
-  }
-  .cart-popup .cart-popup-footer .cart-popup-footer-btn {
-    margin-top: 10px;
-    width: 100%;
-    border-radius: 50px;
-    border: none;
-    background-color: #E3E2E0;
-    padding: 5px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-  .cursor-pointer {
-    cursor: pointer;
-  }
-  .not-in-stock {
-    background-color: #FCF4F2;
-  }
-  span.product-not-in-stock {
-    font-size: 11px;
-  }
-  .replace-product-link {
-    text-align: center;
-  }
-  .cart-popup-modules {
-    padding: 20px;
-  }
-  .cart-popup-modules .cart-popup-modules-title {
-    font-size: 14px;
-    margin-bottom: 10px;
-  }
-  .cart-popup-modules .cart-popup-modules-container {
-    margin-top: 15px;
-  }
-  .cart-popup-empty {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100%;
-  }
-  .cart-popup-empty-text {
-    text-align: center;
-  }
+<div class="cart-popup-module-content">
+  <style>
+    .cart-popup {
+      position: fixed;
+      top: 0;
+      right: -350px;
+      width: 350px;
+      z-index: 999;
+      transition: right .2s;
+      height: 100vh;
+      padding: 0;
+    }
+    .cart-popup.show {
+      right: 0;
+      transition: right .2s;
+    }
+    .cart-popup .panel-heading {
+      display: flex;
+      justify-content: space-between;
+    }
+    .cart-popup .cart-popup-close {
+      cursor: pointer;
+    }
+    .cart-popup .panel-body {
+      padding: 0;
+      height: 100%;
+    }
+    .panel-body-inner {
+      overflow-y: auto;
+      height: 85%;
+    }
+    .cart-popup-summary-info {
+      background-color: #FCF4F2;
+      width: 100%;
+      height: max-content;
+      padding: 10px 20px;
+    }
+    .cart-popup-summary-info__cost {
+      display: flex;
+      justify-content: space-between;
+    }
+    .cart-popup-summary-info__text {
+      margin: 10px 0;
+      font-size: 11px;
+    }
+    .cart-popup p {
+      margin: 0;
+      padding: 0;
+    }
+    .cart-popup a {
+      text-decoration: none;
+      color: inherit;
+    }
+    .cart-popup-product-row {
+      display: flex;
+      justify-content: space-around;
+      padding: 20px;
+      border-bottom: 1px solid #e3e3e3;
+    }
+    .cart-popup-product-row:last-child {
+      border-bottom: none;
+    }
+    .cart-popup .cart-popup-product-image {
+      margin-right: 15px;
+      padding: 0;
+    }
+    .cart-popup .cart-popup-product-info {
+      display: flex;
+      flex-direction: column;
+      width: fit-content;
+      padding: 0;
+    }
+    .cart-popup .weight {
+      color: gray;
+      font-size: 11px;
+    }
+    .cart-popup .price .current-price {
+      font-weight: bold;
+    }
+    .cart-popup .price .old-price {
+      color: gray;
+      text-decoration: line-through;
+    }
+    .cart-popup .cart-popup-product-buttons {
+      display: flex;
+      flex-direction: row;
+      align-items: start;
+      padding: 0;
+    }
+    .cart-popup .cart-popup-product-buttons .counts {
+      width: 40px;
+      margin-right: 10px;
+    }
+    .cart-popup .cart-popup-footer {
+      width: 100%;
+      bottom: 0;
+      position: absolute;
+      z-index: 9999;
+      padding: 10px 20px;
+    }
+    .cart-popup .cart-popup-footer .cart-popup-footer-warning {
+      font-size: 11px;
+      border-bottom: 1px solid gray;
+      padding: 5px 5px 10px;
+    }
+    .cart-popup .cart-popup-footer .cart-popup-footer-info {
+      margin: 10px 0;
+      display: flex;
+    }
+    .cart-popup .cart-popup-footer .cart-popup-footer-btn {
+      margin-top: 10px;
+      width: 100%;
+      border-radius: 50px;
+      border: none;
+      background-color: #E3E2E0;
+      padding: 5px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .cursor-pointer {
+      cursor: pointer;
+    }
+    .not-in-stock {
+      background-color: #FCF4F2;
+    }
+    span.product-not-in-stock {
+      font-size: 11px;
+    }
+    .replace-product-link {
+      text-align: center;
+    }
+    .cart-popup-modules {
+      padding: 20px;
+    }
+    .cart-popup-modules .cart-popup-modules-title {
+      font-size: 14px;
+      margin-bottom: 10px;
+    }
+    .cart-popup-modules .cart-popup-modules-container {
+      margin-top: 15px;
+    }
+    .cart-popup-empty {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100%;
+    }
+    .cart-popup-empty-text {
+      text-align: center;
+    }
+    .remove-product-from-cart {
+      margin-left: 5px;
+    }
+  </style>
 
-</style>
+  <div class="panel panel-default cart-popup">
 
-<div class="panel panel-default cart-popup">
+    <div class="panel-heading">
+      {% if module_cart_popup_nik_display_heading %}
+        {{module_cart_popup_nik_name}}
+      {% endif %}
+      <span class="cart-popup-close">{{ button_close }}</span>
+    </div>
 
-  <div class="panel-heading">
-    {% if module_cart_popup_nik_display_heading %}
-      {{module_cart_popup_nik_name}}
-    {% endif %}
-    <span class="cart-popup-close">{{ button_close }}</span>
-  </div>
-
-  <div class="panel-body">
-    <div class="panel-body-inner">
-      {% if products or vouchers %}
-        <div class="cart-popup-summary-info">
-          <div class="cart-popup-summary-info__cost">
-            <span>{{ text_total_cost }} <b>{{ product_count }}</b></span>
-            <span><b>{{ total }}</b></span>
+    <div class="panel-body">
+      <div class="panel-body-inner">
+        {% if products or vouchers %}
+          <div class="cart-popup-summary-info">
+            <div class="cart-popup-summary-info__cost">
+              <span>{{ text_total_cost }} <b>{{ product_count }}</b></span>
+              <span><b>{{ total }}</b></span>
+            </div>
+            <div class="cart-popup-summary-info__text">
+              <p>{{ text_min_order_cost}} <b>100 P</b></p>
+              <p>{{ text_free_delivery_conditions }} <b>1500 P</b></p>
+            </div>
           </div>
-          <div class="cart-popup-summary-info__text">
-            <p>{{ text_min_order_cost}} <b>100 P</b></p>
-            <p>{{ text_free_delivery_conditions }} <b>1500 P</b></p>
-          </div>
-        </div>
-        {% for product in products %}
-          <div class="cart-popup-product-row {% if not product.stock %}not-in-stock{% endif %}">
-            {% if product.thumb %}
-              <a href="{{ product.href }}" class="col-xs-3">
-                <div class="cart-popup-product-image">
-                  <img src="{{ product.thumb }}" alt="{{ product.name }}" title="{{ product.name }}">
-                </div>
-              </a>
-            {% endif %}
-            <a href="{{ product.href }}" class="col-xs-5">
-              <div class="cart-popup-product-info">
-                <p>{{ product.name }}</p>
-                <span class="weight">
-            1 шт ({{ product.weight }})
-            </span>
-                {% if product.stock %}
-                  <span class="price">
-                {% if not product.special %}
-                  <span class="current-price">
-                    {{ product.price }}
+          {% for product in products %}
+            <div class="cart-popup-product-row {% if not product.stock %}not-in-stock{% endif %}">
+              {% if product.thumb %}
+                <a href="{{ product.href }}" class="col-xs-3">
+                  <div class="cart-popup-product-image">
+                    <img src="{{ product.thumb }}" alt="{{ product.name }}" title="{{ product.name }}">
+                  </div>
+                </a>
+              {% endif %}
+              <a href="{{ product.href }}" class="col-xs-5">
+                <div class="cart-popup-product-info">
+                  <p>{{ product.name }}</p>
+                  <span class="weight">
+                    1 шт ({{ product.weight }})
                   </span>
-                {% else %}
-                  <span class="current-price">
-                    {{ product.special }}
-                  </span>
-                  <span class="old-price">
-                    {{ product.price }}
-                  </span>
-                {% endif %}
-              </span>
-                {% else %}
-                  <span class="product-not-in-stock">
+                  {% if product.stock %}
+                    <span class="price">
+                      {% if not product.special %}
+                        <span class="current-price">
+                          {{ product.price }}
+                        </span>
+                      {% else %}
+                        <span class="current-price">
+                          {{ product.special }}
+                        </span>
+                        <span class="old-price">
+                          {{ product.price }}
+                        </span>
+                      {% endif %}
+                    </span>
+                  {% else %}
+                    <span class="product-not-in-stock">
                     {{ text_product_out_of_stock }}
                   </span>
+                  {% endif %}
+                </div>
+              </a>
+              <div class="cart-popup-product-buttons col-xs-4">
+                {% if product.stock %}
+                  <input class="counts" min="1" data-cart-id="{{ product.cart_id }}" type="number" value="{{ product.quantity }}">
+                {% else %}
+                  <a class="replace-product-link" href="{{ product.category_link }}">{{ text_replace_product }}</a>
                 {% endif %}
+                <span class="cursor-pointer remove-product-from-cart" data-cart-id="{{ product.cart_id }}" title="{{ button_remove }}">X</span>
               </div>
-            </a>
-            <div class="cart-popup-product-buttons col-xs-4">
-              {% if product.stock %}
-                <input class="counts" type="number" value="{{ product.quantity }}">
-              {% else %}
-                <a class="replace-product-link" href="{{ product.category_link }}">{{ text_replace_product }}</a>
-              {% endif %}
-              <span class="cursor-pointer" onclick="cart.remove('{{ product.cart_id }}');$(this).parents('.cart-popup-product-row').remove()" title="{{ button_remove }}">X</span>
             </div>
-          </div>
-        {% endfor %}
-        {% if modules %}
-          <div class="cart-popup-modules">
-            <span class="cart-popup-modules-title">{{ text_modules_heading }}</span>
-            <div class="cart-popup-modules-container">
-              {% for module in modules %}
-                {{ module }}
-              {% endfor %}
+          {% endfor %}
+          {% for voucher in vouchers %}
+            <tr>
+              <td></td>
+              <td class="text-left">{{ voucher.description }}</td>
+              <td class="text-left"></td>
+
+              <td class="text-right">{{ voucher.amount }}</td>
+              <td class="text-right">{{ voucher.amount }}</td>
+            </tr>
+            <div class="cart-popup-product-row {% if not product.stock %}not-in-stock{% endif %}">
+                <div class="cart-popup-product-info col-xs-5">
+                  <p>{{ voucher.description }}</p>
+                  <span class="price">
+                    <span class="current-price">
+                      {{ voucher.amount }}
+                    </span>
+                  </span>
+                </div>
+              <div class="cart-popup-product-buttons col-xs-4">
+                <span class="cursor-pointer" onclick="voucher.remove('{{ voucher.key }}');" title="{{ button_remove }}">X</span>
+              </div>
             </div>
+          {% endfor %}
+          {% if modules %}
+            <div class="cart-popup-modules">
+              <span class="cart-popup-modules-title">{{ text_modules_heading }}</span>
+              <div class="cart-popup-modules-container">
+                {% for module in modules %}
+                  {{ module }}
+                {% endfor %}
+              </div>
+            </div>
+          {% endif %}
+        {% else %}
+          <div class="cart-popup-empty">
+            <p class="cart-popup-empty-text">
+              {{ text_cart_empty }}
+            </p>
           </div>
         {% endif %}
-      {% else %}
-        <div class="cart-popup-empty">
-          <p class="cart-popup-empty-text">
-            {{ text_cart_empty }}
-          </p>
-        </div>
-      {% endif %}
+      </div>
     </div>
-  </div>
-  {% if products or vouchers %}
-  <div class="panel-footer cart-popup-footer">
-    {% for total in totals %}
-      <tr>
-        <td class="text-right"><strong>{{ total.title }}:</strong></td>
-        <td class="text-right">{{ total.text }}</td>
-      </tr>
-    {% endfor %}
-    {% if not_in_stock %}
-      <div class="cart-popup-footer-warning">
-        <p>
-          <i class="fa fa-exclamation-circle"></i>
-          {{ not_in_stock}} {{ text_product_in_cart_out_of_stock }}
-        </p>
-        <p>{{ text_product_can_be_replaced }}</p>
+    {% if products or vouchers %}
+      <div class="panel-footer cart-popup-footer">
+        {% for total in totals %}
+          <tr>
+            <td class="text-right"><strong>{{ total.title }}:</strong></td>
+            <td class="text-right">{{ total.text }}</td>
+          </tr>
+        {% endfor %}
+        {% if not_in_stock %}
+          <div class="cart-popup-footer-warning">
+            <p>
+              <i class="fa fa-exclamation-circle"></i>
+              {{ not_in_stock}} {{ text_product_in_cart_out_of_stock }}
+            </p>
+            <p>{{ text_product_can_be_replaced }}</p>
+          </div>
+        {% endif %}
+        <div class="cart-popup-footer-info">
+          <span class="col-xs-6">{{ text_delivery}} 200 P</span>
+          <span class="col-xs-6">{{ text_sale }} -200 P</span>
+        </div>
+        <a href="{{ checkout }}" class="cart-popup-footer-btn">{{ button_checkout}} {{ total }}</a>
       </div>
     {% endif %}
-    <div class="cart-popup-footer-info">
-      <span class="col-xs-6">{{ text_delivery}} 200 P</span>
-      <span class="col-xs-6">{{ text_sale }} -200 P</span>
-    </div>
-    <a href="{{ checkout }}" class="cart-popup-footer-btn">{{ button_checkout}} {{ total }}</a>
   </div>
-  {% endif %}
-</div>
 
-<script>
-    $(document).ready(function() {
-        $(".{{ module_cart_popup_nik_button_class }}").click(function() {
-            $('.cart-popup').toggleClass("show");
-        });
-        $(".cart-popup-close").click(function() {
-            $('.cart-popup').removeClass("show");
-        });
-    });
-</script>
+  <script>
+      $(document).ready(function() {
+          $(".{{ module_cart_popup_nik_button_class }}").click(function() {
+              $('.cart-popup').toggleClass("show");
+          });
+          $('.cart-popup').delegate('.cart-popup-close', 'click', function() {
+              $('.cart-popup').removeClass("show");
+          });
+          $('.cart-popup').delegate('.counts', 'change', function() {
+              let productCartId = $(this).attr('data-cart-id');
+              let productQuantity = $(this).val();
+              $.ajax({
+                  url: "index.php?route=extension/module/cart_popup_nik/update&cart_id=" + productCartId + "&quantity=" + productQuantity,
+                  type: "html",
+                  success: function (response) {
+                      $('.cart-popup').html($(response).find('.cart-popup').html());
+                  }
+              })
+          });
+          $('.cart-popup').delegate('.remove-product-from-cart', 'click', function() {
+              let productCartId = $(this).attr('data-cart-id');
+              updateCart(productCartId);
+          });
+          function removeFromCart(productCartId) {
+              cart.remove(productCartId);
+          }
+          function updateCart(productCartId) {
+              $.ajax({
+                  url: "index.php?route=extension/module/cart_popup_nik/update",
+                  type: "html",
+                  beforeSend: function () {
+                      if(productCartId) {
+                          removeFromCart(productCartId);
+                      }
+                  },
+                  success: function (response) {
+                      $('.cart-popup').html($(response).find('.cart-popup').html());
+                  }
+              })
+          }
+      });
+  </script>
+</div>

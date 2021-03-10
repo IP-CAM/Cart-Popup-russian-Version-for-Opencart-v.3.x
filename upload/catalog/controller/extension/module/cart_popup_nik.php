@@ -1,7 +1,21 @@
 <?php
 class ControllerExtensionModuleCartPopupNik extends Controller {
 	public function index() {
-		$this->load->language('extension/module/cart_popup_nik');
+	    $data = $this->getPopupCart();
+        return $this->load->view('extension/module/cart_popup_nik', $data);
+
+	}
+
+	public function update() {
+	    if (isset($this->request->get['cart_id']) && isset($this->request->get['quantity'])) {
+            $this->cart->update($this->request->get['cart_id'], $this->request->get['quantity']);
+        }
+        $data = $this->getPopupCart();
+        $this->response->setOutput($this->load->view('extension/module/cart_popup_nik', $data));
+    }
+
+    private function getPopupCart() {
+        $this->load->language('extension/module/cart_popup_nik');
 
         $this->load->model('setting/setting');
 
@@ -12,9 +26,9 @@ class ControllerExtensionModuleCartPopupNik extends Controller {
         $this->load->model('tool/image');
         $this->load->model('tool/upload');
 
-		$data['products'] = array();
-		$not_in_stock = 0;
-		$product_count = 0;
+        $data['products'] = array();
+        $not_in_stock = 0;
+        $product_count = 0;
         foreach ($this->cart->getProducts() as $product) {
             $product_info = $this->model_catalog_product->getProduct($product['product_id']);
             $product_category_info = $this->model_catalog_product->getCategories($product['product_id']);
@@ -96,6 +110,21 @@ class ControllerExtensionModuleCartPopupNik extends Controller {
             $product_count++;
         }
 
+        // Gift Voucher
+        $data['vouchers'] = array();
+
+        if (!empty($this->session->data['vouchers'])) {
+            foreach ($this->session->data['vouchers'] as $key => $voucher) {
+                $data['vouchers'][] = array(
+                    'key'         => $key,
+                    'description' => $voucher['description'],
+                    'amount'      => $this->currency->format($voucher['amount'], $this->session->data['currency']),
+                    'remove'      => $this->url->link('checkout/cart', 'remove=' . $key)
+                );
+            }
+        }
+
+        $this->load->model('setting/module');
         $data['modules'] = array();
 
         if($data['module_cart_popup_nik_displayed_modules']) {
@@ -185,6 +214,6 @@ class ControllerExtensionModuleCartPopupNik extends Controller {
         $data['not_in_stock'] = $not_in_stock;
         $data['product_count'] = $product_count;
 
-        return $this->load->view('extension/module/cart_popup_nik', $data);
-	}
+        return $data;
+    }
 }
