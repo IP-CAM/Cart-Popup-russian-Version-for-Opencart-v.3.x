@@ -153,10 +153,6 @@ class ControllerExtensionModuleCartPopupNik extends Controller {
             }
         }
 
-//        echo "<pre>";
-//        print_r($data['modules']);
-//        echo "</pre>";
-
         // Totals
         $this->load->model('setting/extension');
 

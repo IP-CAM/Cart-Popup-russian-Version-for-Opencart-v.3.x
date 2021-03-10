@@ -101,15 +101,30 @@ class ControllerExtensionModuleCartPopupNik extends Controller {
             $displayed_modules = $this->config->get('module_cart_popup_nik_displayed_modules');
         }
 
+        $this->load->model('setting/module');
+
         if($displayed_modules) {
             foreach ($displayed_modules as $module) {
                 if($module) {
                     $part = explode('.', $module);
-                    $this->load->language('extension/module/' . $part[0], 'extension');
-                    $data['module_cart_popup_nik_displayed_modules'][] = array(
-                        'code' => $module,
-                        'name' => strip_tags($this->language->get('extension')->get('heading_title'))
-                    );
+
+                    if (isset($part[1])) {
+                        $setting_info = $this->model_setting_module->getModule($part[1]);
+                        if ($setting_info) {
+                            $data['module_cart_popup_nik_displayed_modules'][] = array(
+                                'code' => $module,
+                                'name' => $setting_info['name']
+                            );
+                        }
+                    } else {
+                        $this->load->language('extension/module/' . $part[0], 'extension');
+                        $data['module_cart_popup_nik_displayed_modules'][] = array(
+                            'code' => $module,
+                            'name' => strip_tags($this->language->get('extension')->get('heading_title'))
+                        );
+                    }
+
+
                 }
 
             }
