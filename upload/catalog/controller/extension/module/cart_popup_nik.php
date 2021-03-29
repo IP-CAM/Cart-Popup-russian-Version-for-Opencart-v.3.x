@@ -91,6 +91,7 @@ class ControllerExtensionModuleCartPopupNik extends Controller {
             $data['products'][] = array(
                 'cart_id'   => $product['cart_id'],
                 'thumb'     => $image,
+                'product_id'=> $product['product_id'],
                 'name'      => $product['name'],
                 'model'     => $product['model'],
                 'option'    => $option_data,
@@ -127,7 +128,7 @@ class ControllerExtensionModuleCartPopupNik extends Controller {
         $this->load->model('setting/module');
         $data['modules'] = array();
 
-        if($data['module_cart_popup_nik_displayed_modules']) {
+        if(isset($data['module_cart_popup_nik_displayed_modules'])) {
             foreach ($data['module_cart_popup_nik_displayed_modules'] as $module) {
                 $part = explode('.', $module);
 
@@ -211,5 +212,32 @@ class ControllerExtensionModuleCartPopupNik extends Controller {
         $data['product_count'] = $product_count;
 
         return $data;
+    }
+
+    public function getSimilarProducts() {
+        if (isset($this->request->get['product_id'])) {
+            $this->load->model('catalog/product');
+            $this->load->model('extension/module/cart_popup_nik');
+
+            $product_info = $this->model_catalog_product->getProduct($this->request->get['product_id']);
+            $product_category_info = $this->model_catalog_product->getCategories($this->request->get['product_id']);
+
+
+            $category_id = isset($product_category_info[0]) ? $product_category_info[0]['category_id'] : array();
+
+            $json = array();
+
+            if (!empty($category_id)) {
+
+                $filter_data = array(
+                    'filter_category_id' => $category_id
+                );
+
+                $json = $this->model_extension_module_cart_popup_nik->getProducts($filter_data);
+            }
+
+            $this->response->addHeader('Content-Type: application/json');
+            $this->response->setOutput(json_encode($json));
+        }
     }
 }

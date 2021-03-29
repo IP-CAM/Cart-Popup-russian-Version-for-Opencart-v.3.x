@@ -5,7 +5,7 @@
       top: 0;
       right: -350px;
       width: 350px;
-      z-index: 999;
+      z-index: 997;
       transition: right .2s;
       height: 100vh;
       padding: 0;
@@ -129,6 +129,7 @@
     }
     .replace-product-link {
       text-align: center;
+      cursor: pointer;
     }
     .cart-popup-modules {
       padding: 20px;
@@ -152,6 +153,38 @@
     .remove-product-from-cart {
       margin-left: 5px;
     }
+
+    .cart-popup-replace-layout {
+      width: 350px;
+      z-index: 998;
+      height: calc(100vh - 41px - 147px);
+      background-color: #fff;
+      position: absolute;
+      top: 41px;
+      right: -350px;
+      transition: right .2s;
+      padding: 0;
+    }
+    .cart-popup-replace-layout.show {
+      right: 0;
+      transition: right .2s;
+    }
+    .cart-popup-back-btn {
+      margin-top: 10px;
+      width: 100%;
+      border-radius: 50px;
+      border: none;
+      background-color: #E3E2E0;
+      padding: 5px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+    .cart-popup-replace-layout-inner-container {
+      overflow-y: auto;
+      height: 90%;
+    }
   </style>
 
   <div class="panel panel-default cart-popup">
@@ -165,6 +198,16 @@
 
     <div class="panel-body">
       <div class="panel-body-inner">
+
+        <div class="cart-popup-replace-layout">
+          <div class="cart-popup-replace-layout-inner-container">
+
+
+
+          </div>
+          <span class="cart-popup-back-btn">{{ button_get_back }}</span>
+        </div>
+
         {% if products or vouchers %}
           <div class="cart-popup-summary-info">
             <div class="cart-popup-summary-info__cost">
@@ -217,7 +260,7 @@
                 {% if product.stock %}
                   <input class="counts" min="1" data-cart-id="{{ product.cart_id }}" type="number" value="{{ product.quantity }}">
                 {% else %}
-                  <a class="replace-product-link" href="{{ product.category_link }}">{{ text_replace_product }}</a>
+                  <span class="replace-product-link" data-product-id="{{ product.product_id }}">{{ text_replace_product }}</span>
                 {% endif %}
                 <span class="cursor-pointer remove-product-from-cart" data-cart-id="{{ product.cart_id }}" title="{{ button_remove }}">X</span>
               </div>
@@ -293,6 +336,75 @@
 
   <script>
       $(document).ready(function() {
+          $('.replace-product-link').on('click', function () {
+              // todo call layout
+              $('.cart-popup-replace-layout').addClass("show");
+              let product_id = $(this).attr('data-product-id')
+              getSimilarProducts(product_id)
+
+          })
+          $('.cart-popup').delegate('.cart-popup-back-btn', 'click', function () {
+              $('.cart-popup-replace-layout').removeClass("show");
+          })
+
+          function getSimilarProducts(product_id) {
+              $.ajax({
+                  url: "index.php?route=extension/module/cart_popup_nik/getSimilarProducts&product_id=" + product_id,
+                  type: "json",
+                  success: function (response) {
+                      console.log(response)
+                  }
+              })
+          }
+
+          function renderSimilarProductsHTML(products) {
+              let html = '';
+              for (let i = 0; i < products.length; i++) {
+                  html += '<div class="cart-popup-product-row">\n';
+
+                        if (products[i].thumb) {
+                          html += '                  <a href="' + products[i].href + ''" class="col-xs-3">\n' +
+                              '                    <div class="cart-popup-product-image">\n' +
+                              '                      <img src="{{ product.thumb }}" alt="{{ product.name }}" title="{{ product.name }}">\n' +
+                              '                    </div>\n' +
+                              '                  </a>\n';
+                        }
+
+                      '                <a href="{{ product.href }}" class="col-xs-5">\n' +
+                      '                  <div class="cart-popup-product-info">\n' +
+                      '                    <p>{{ product.name }}</p>\n' +
+                      '                    <span class="weight">\n' +
+                      '                      1 шт ({{ product.weight }})\n' +
+                      '                    </span>\n' +
+                      '                    {% if product.stock %}\n' +
+                      '                      <span class="price">\n' +
+                      '                      {% if not product.special %}\n' +
+                      '                        <span class="current-price">\n' +
+                      '                          {{ product.price }}\n' +
+                      '                        </span>\n' +
+                      '                      {% else %}\n' +
+                      '                        <span class="current-price">\n' +
+                      '                          {{ product.special }}\n' +
+                      '                        </span>\n' +
+                      '                        <span class="old-price">\n' +
+                      '                          {{ product.price }}\n' +
+                      '                        </span>\n' +
+                      '                      {% endif %}\n' +
+                      '                    </span>\n' +
+                      '                    {% else %}\n' +
+                      '                      <span class="product-not-in-stock">\n' +
+                      '                    {{ text_product_out_of_stock }}\n' +
+                      '                  </span>\n' +
+                      '                    {% endif %}\n' +
+                      '                  </div>\n' +
+                      '                </a>\n' +
+                      '                <div class="cart-popup-product-buttons col-xs-4">\n' +
+                      '                    <input class="counts" min="1" data-cart-id="{{ product.cart_id }}" type="number" value="{{ product.quantity }}">\n' +
+                      '                </div>\n' +
+                      '              </div>'
+              }
+          }
+
           $(".{{ module_cart_popup_nik_button_class }}").click(function() {
               $('.cart-popup').toggleClass("show");
           });
