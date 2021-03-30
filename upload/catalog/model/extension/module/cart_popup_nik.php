@@ -126,11 +126,12 @@ class ModelExtensionModuleCartPopupNik extends Model {
         $query = $this->db->query($sql);
 
         foreach ($query->rows as $result) {
-            $product_data[$result['product_id']] = $this->getProduct($result['product_id']);
+            $product = $this->getProduct($result['product_id']);
+            if ($product) {
+                $product_data[$result['product_id']] = $product;
+            }
         }
 
         return $product_data;
     }
-
-
 }

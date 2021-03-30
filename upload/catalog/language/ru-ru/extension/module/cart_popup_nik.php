@@ -19,3 +19,4 @@ $_['text_cart_empty'] = 'Корзина пуста';
 $_['button_close']  = 'Закрыть';
 $_['button_checkout']  = 'Перейти к оформлению';
 $_['button_get_back']  = 'Вернуться назад';
+$_['button_buy']       = 'Купить';

@@ -185,6 +185,23 @@
       overflow-y: auto;
       height: 90%;
     }
+    .cart-popup-product-replace-buttons {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 0;
+    }
+    .cart-popup-product-replace-buttons .counts {
+      width: 40px;
+      margin-right: 10px;
+    }
+    .cart-popup-product-replace-buttons .cart-popup-buy-product {
+      padding: 5px 15px;
+      background-color: #07C5DB;
+      border-radius: 15px;
+      color: #fff;
+      margin-top: 5px;
+    }
   </style>
 
   <div class="panel panel-default cart-popup">
@@ -260,7 +277,7 @@
                 {% if product.stock %}
                   <input class="counts" min="1" data-cart-id="{{ product.cart_id }}" type="number" value="{{ product.quantity }}">
                 {% else %}
-                  <span class="replace-product-link" data-product-id="{{ product.product_id }}">{{ text_replace_product }}</span>
+                  <span class="replace-product-link" data-cart-id="{{ product.cart_id }}" data-product-id="{{ product.product_id }}">{{ text_replace_product }}</span>
                 {% endif %}
                 <span class="cursor-pointer remove-product-from-cart" data-cart-id="{{ product.cart_id }}" title="{{ button_remove }}">X</span>
               </div>
@@ -334,115 +351,135 @@
     {% endif %}
   </div>
 
-  <script>
-      $(document).ready(function() {
-          $('.replace-product-link').on('click', function () {
-              // todo call layout
-              $('.cart-popup-replace-layout').addClass("show");
-              let product_id = $(this).attr('data-product-id')
-              getSimilarProducts(product_id)
-
-          })
-          $('.cart-popup').delegate('.cart-popup-back-btn', 'click', function () {
-              $('.cart-popup-replace-layout').removeClass("show");
-          })
-
-          function getSimilarProducts(product_id) {
-              $.ajax({
-                  url: "index.php?route=extension/module/cart_popup_nik/getSimilarProducts&product_id=" + product_id,
-                  type: "json",
-                  success: function (response) {
-                      console.log(response)
-                  }
-              })
-          }
-
-          function renderSimilarProductsHTML(products) {
-              let html = '';
-              for (let i = 0; i < products.length; i++) {
-                  html += '<div class="cart-popup-product-row">\n';
-
-                        if (products[i].thumb) {
-                          html += '                  <a href="' + products[i].href + ''" class="col-xs-3">\n' +
-                              '                    <div class="cart-popup-product-image">\n' +
-                              '                      <img src="{{ product.thumb }}" alt="{{ product.name }}" title="{{ product.name }}">\n' +
-                              '                    </div>\n' +
-                              '                  </a>\n';
-                        }
-
-                      '                <a href="{{ product.href }}" class="col-xs-5">\n' +
-                      '                  <div class="cart-popup-product-info">\n' +
-                      '                    <p>{{ product.name }}</p>\n' +
-                      '                    <span class="weight">\n' +
-                      '                      1 шт ({{ product.weight }})\n' +
-                      '                    </span>\n' +
-                      '                    {% if product.stock %}\n' +
-                      '                      <span class="price">\n' +
-                      '                      {% if not product.special %}\n' +
-                      '                        <span class="current-price">\n' +
-                      '                          {{ product.price }}\n' +
-                      '                        </span>\n' +
-                      '                      {% else %}\n' +
-                      '                        <span class="current-price">\n' +
-                      '                          {{ product.special }}\n' +
-                      '                        </span>\n' +
-                      '                        <span class="old-price">\n' +
-                      '                          {{ product.price }}\n' +
-                      '                        </span>\n' +
-                      '                      {% endif %}\n' +
-                      '                    </span>\n' +
-                      '                    {% else %}\n' +
-                      '                      <span class="product-not-in-stock">\n' +
-                      '                    {{ text_product_out_of_stock }}\n' +
-                      '                  </span>\n' +
-                      '                    {% endif %}\n' +
-                      '                  </div>\n' +
-                      '                </a>\n' +
-                      '                <div class="cart-popup-product-buttons col-xs-4">\n' +
-                      '                    <input class="counts" min="1" data-cart-id="{{ product.cart_id }}" type="number" value="{{ product.quantity }}">\n' +
-                      '                </div>\n' +
-                      '              </div>'
-              }
-          }
-
-          $(".{{ module_cart_popup_nik_button_class }}").click(function() {
-              $('.cart-popup').toggleClass("show");
-          });
-          $('.cart-popup').delegate('.cart-popup-close', 'click', function() {
-              $('.cart-popup').removeClass("show");
-          });
-          $('.cart-popup').delegate('.counts', 'change', function() {
-              let productCartId = $(this).attr('data-cart-id');
-              let productQuantity = $(this).val();
-              $.ajax({
-                  url: "index.php?route=extension/module/cart_popup_nik/update&cart_id=" + productCartId + "&quantity=" + productQuantity,
-                  type: "html",
-                  success: function (response) {
-                      $('.cart-popup').html($(response).find('.cart-popup').html());
-                  }
-              })
-          });
-          $('.cart-popup').delegate('.remove-product-from-cart', 'click', function() {
-              let productCartId = $(this).attr('data-cart-id');
-              updateCart(productCartId);
-          });
-          function removeFromCart(productCartId) {
-              cart.remove(productCartId);
-          }
-          function updateCart(productCartId) {
-              $.ajax({
-                  url: "index.php?route=extension/module/cart_popup_nik/update",
-                  type: "html",
-                  beforeSend: function () {
-                      if(productCartId) {
-                          removeFromCart(productCartId);
-                      }
-                  },
-                  success: function (response) {
-                      $('.cart-popup').html($(response).find('.cart-popup').html());
-                  }
-              })
-          }
-      });
-  </script>
 </div>
+<script>
+    $(document).ready(function() {
+        $('.cart-popup').delegate('.replace-product-link', 'click', function () {
+            $('.cart-popup-replace-layout').addClass("show");
+            let product_id = $(this).attr('data-product-id')
+            let cart_id = $(this).attr('data-cart-id')
+            getSimilarProducts(product_id, cart_id)
+        })
+        $('.cart-popup').delegate('.cart-popup-back-btn', 'click', function () {
+            $('.cart-popup-replace-layout').removeClass("show");
+            updateCart()
+        })
+
+        function getSimilarProducts(product_id, cart_id) {
+            $.ajax({
+                url: "index.php?route=extension/module/cart_popup_nik/getSimilarProducts&product_id=" + product_id,
+                type: "json",
+                beforeSend: function() {
+                    $('.cart-popup-replace-layout-inner-container').html('')
+                },
+                success: function (response) {
+                    $('.cart-popup-replace-layout-inner-container').html(renderSimilarProductsHTML(response, cart_id))
+                }
+            })
+        }
+
+        function renderSimilarProductsHTML(products, replace_cart_id) {
+            let html = '';
+            for (let i = 0; i < products['products'].length; i++) {
+
+                html += '<div class="cart-popup-product-row">'
+
+                if (products['products'][i].thumb) {
+                    html += '<a href="' + products['products'][i].href + '" class="col-xs-3">\n' +
+                              '<div class="cart-popup-product-image">\n' +
+                                '<img src="' + products['products'][i].thumb + '" alt="' + products['products'][i].name + '" title="' + products['products'][i].name + '">\n' +
+                              '</div>\n' +
+                            '</a>\n';
+                }
+
+                html += '      <a href="' + products['products'][i].href + '" class="col-xs-5">\n' +
+                        '         <div class="cart-popup-product-info">\n' +
+                        '            <p>' + products['products'][i].name + '</p>\n' +
+                        '               <span class="weight">\n' +
+                        '                  1 шт (' + products['products'][i].weight + ')\n' +
+                        '               </span>\n' +
+                        '                    <span class="price">\n';
+
+                if (!products['products'][i].special) {
+                    html += '                        <span class="current-price">\n' +
+                                                        products['products'][i].price +
+                            '                        </span>\n';
+                } else {
+                    html += '                    <span class="current-price">\n' +
+                                                    products['products'][i].special +
+                        '                        </span>\n' +
+                        '                        <span class="old-price">\n' +
+                                                    products['products'][i].price +
+                        '                        </span>\n';
+                }
+
+                html += '                    </span>\n' +
+                        '                </div>\n' +
+                        '              </a>\n';
+
+                html += '              <div class="cart-popup-product-replace-buttons col-xs-4">\n' +
+                        '                  <input class="counts" min="1" data-cart-id="" type="number" value="' + products['products'][i].minimum + '">\n' +
+                        '                  <span class="cursor-pointer cart-popup-buy-product" data-replace-cart-id="' + replace_cart_id + '" data-product-id="' + products['products'][i].product_id + '">{{ button_buy }}</span>\n' +
+                        '              </div>\n' +
+                        '            </div>'
+
+                html += '</div>'
+            }
+
+            return html;
+        }
+
+        $('.cart-popup').delegate('.cart-popup-product-replace-buttons .cart-popup-buy-product', 'click', function () {
+            let countProducts = $(this).parents('.cart-popup-product-replace-buttons').find('.counts').val()
+            let productId     = $(this).attr('data-product-id')
+            let replaceCartId     = $(this).attr('data-replace-cart-id')
+
+            if (countProducts > 0) {
+                cart.add(productId, countProducts)
+                removeFromCart(replaceCartId)
+            }
+        })
+
+        $(".{{ module_cart_popup_nik_button_class }}").click(function() {
+            $('.cart-popup').toggleClass("show");
+        });
+        $('.cart-popup').delegate('.cart-popup-close', 'click', function() {
+            $('.cart-popup').removeClass("show");
+        });
+        $('.cart-popup').delegate('.cart-popup-product-buttons .counts', 'change', function() {
+            let productCartId = $(this).attr('data-cart-id');
+            let productQuantity = $(this).val();
+            $.ajax({
+                url: "index.php?route=extension/module/cart_popup_nik/update&cart_id=" + productCartId + "&quantity=" + productQuantity,
+                type: "html",
+                success: function (response) {
+                    $('.cart-popup').html($(response).find('.cart-popup').html());
+                }
+            })
+        });
+
+        $('.cart-popup').delegate('.remove-product-from-cart', 'click', function() {
+            let productCartId = $(this).attr('data-cart-id');
+            updateCart(productCartId);
+        });
+
+        function removeFromCart(productCartId) {
+            cart.remove(productCartId);
+        }
+
+        function updateCart(productCartId) {
+            $.ajax({
+                url: "index.php?route=extension/module/cart_popup_nik/update",
+                type: "html",
+                beforeSend: function () {
+                    if(productCartId) {
+                        removeFromCart(productCartId);
+                    }
+                },
+                success: function (response) {
+                    $('.cart-popup').html($(response).find('.cart-popup').html());
+                }
+            })
+        }
+    });
+</script>

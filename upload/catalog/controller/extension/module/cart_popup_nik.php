@@ -218,10 +218,16 @@ class ControllerExtensionModuleCartPopupNik extends Controller {
         if (isset($this->request->get['product_id'])) {
             $this->load->model('catalog/product');
             $this->load->model('extension/module/cart_popup_nik');
+            $this->load->model('tool/image');
+            $this->load->model('tool/upload');
 
-            $product_info = $this->model_catalog_product->getProduct($this->request->get['product_id']);
-            $product_category_info = $this->model_catalog_product->getCategories($this->request->get['product_id']);
+            $product_to_replace_info = $this->model_catalog_product->getProduct($this->request->get['product_id']);
+            $product_category_info   = $this->model_catalog_product->getCategories($this->request->get['product_id']);
 
+            $product_to_replace_price = $product_to_replace_info['special'] ? $product_to_replace_info['special'] : $product_to_replace_info['price'];
+
+            $price_deviation_min = ($product_to_replace_price > 51) ? ($product_to_replace_price - 50) : $product_to_replace_price;
+            $price_deviation_max = $product_to_replace_price + 50;
 
             $category_id = isset($product_category_info[0]) ? $product_category_info[0]['category_id'] : array();
 
@@ -233,7 +239,204 @@ class ControllerExtensionModuleCartPopupNik extends Controller {
                     'filter_category_id' => $category_id
                 );
 
-                $json = $this->model_extension_module_cart_popup_nik->getProducts($filter_data);
+                $products = $this->model_extension_module_cart_popup_nik->getProducts($filter_data);
+
+                foreach ($products as $product) {
+                    $product_info = $this->model_catalog_product->getProduct($product['product_id']);
+
+                    if ($product['image']) {
+                        $image = $this->model_tool_image->resize($product['image'], $this->config->get('theme_' . $this->config->get('config_theme') . '_image_cart_width'), $this->config->get('theme_' . $this->config->get('config_theme') . '_image_cart_height'));
+                    } else {
+                        $image = '';
+                    }
+
+                    if ($product_info['weight']) {
+                        $weight = $this->weight->format($product_info['weight'], $product_info['weight_class_id'], $this->language->get('decimal_point'), $this->language->get('thousand_point'));
+                    } else {
+                        $weight = '';
+                    }
+
+                    // Display prices
+                    if ($this->customer->isLogged() || !$this->config->get('config_customer_price')) {
+                        $unit_price = $this->tax->calculate($product['price'], $product['tax_class_id'], $this->config->get('config_tax'));
+
+                        if ((float)$product_info['special']) {
+                            $special = $this->currency->format($this->tax->calculate($product_info['special'], $product_info['tax_class_id'], $this->config->get('config_tax')), $this->session->data['currency']);
+                            $price = $this->currency->format($product_info['price'], $this->session->data['currency']);
+                            $total = $this->currency->format($product_info['price'] * $product['quantity'], $this->session->data['currency']);
+                        } else {
+                            $special = false;
+                            $price = $this->currency->format($unit_price, $this->session->data['currency']);
+                            $total = $this->currency->format($unit_price * $product['quantity'], $this->session->data['currency']);
+                        }
+                    } else {
+                        $price = false;
+                        $total = false;
+                        $special = false;
+                    }
+
+                    if ($product['special']) {
+                        if ($product['special'] > $price_deviation_min && $product['special'] < $price_deviation_max) {
+                            $json['products'][] = array(
+                                'thumb'     => $image,
+                                'product_id'=> $product['product_id'],
+                                'name'      => $product['name'],
+                                'quantity'  => $product['quantity'],
+                                'minimum'   => $product['minimum'],
+                                'price'     => $price,
+                                'special'   => $special,
+                                'weight'    => $weight,
+                                'total'     => $total,
+                                'href'      => $this->url->link('product/product', 'product_id=' . $product['product_id'])
+                            );
+                        }
+                    } else {
+                        if ($product['price'] > $price_deviation_min && $product['price'] < $price_deviation_max) {
+                            $json['products'][] = array(
+                                'thumb'     => $image,
+                                'product_id'=> $product['product_id'],
+                                'name'      => $product['name'],
+                                'quantity'  => $product['quantity'],
+                                'minimum'   => $product['minimum'],
+                                'price'     => $price,
+                                'special'   => $special,
+                                'weight'    => $weight,
+                                'total'     => $total,
+                                'href'      => $this->url->link('product/product', 'product_id=' . $product['product_id'])
+                            );
+                        }
+                    }
+                }
+
+                $filter_data = array(
+                    'filter_manufacturer_id' => $product_to_replace_info['manufacturer_id']
+                );
+
+                $products = $this->model_extension_module_cart_popup_nik->getProducts($filter_data);
+
+                foreach ($products as $product) {
+                    $product_info = $this->model_catalog_product->getProduct($product['product_id']);
+
+                    if ($product['image']) {
+                        $image = $this->model_tool_image->resize($product['image'], $this->config->get('theme_' . $this->config->get('config_theme') . '_image_cart_width'), $this->config->get('theme_' . $this->config->get('config_theme') . '_image_cart_height'));
+                    } else {
+                        $image = '';
+                    }
+
+                    if ($product_info['weight']) {
+                        $weight = $this->weight->format($product_info['weight'], $product_info['weight_class_id'], $this->language->get('decimal_point'), $this->language->get('thousand_point'));
+                    } else {
+                        $weight = '';
+                    }
+
+                    // Display prices
+                    if ($this->customer->isLogged() || !$this->config->get('config_customer_price')) {
+                        $unit_price = $this->tax->calculate($product['price'], $product['tax_class_id'], $this->config->get('config_tax'));
+
+                        if ((float)$product_info['special']) {
+                            $special = $this->currency->format($this->tax->calculate($product_info['special'], $product_info['tax_class_id'], $this->config->get('config_tax')), $this->session->data['currency']);
+                            $price = $this->currency->format($product_info['price'], $this->session->data['currency']);
+                            $total = $this->currency->format($product_info['price'] * $product['quantity'], $this->session->data['currency']);
+                        } else {
+                            $special = false;
+                            $price = $this->currency->format($unit_price, $this->session->data['currency']);
+                            $total = $this->currency->format($unit_price * $product['quantity'], $this->session->data['currency']);
+                        }
+                    } else {
+                        $price = false;
+                        $total = false;
+                        $special = false;
+                    }
+
+                    if ($product['special']) {
+                        if ($product['special'] > $price_deviation_min && $product['special'] < $price_deviation_max) {
+                            $json['products'][] = array(
+                                'thumb'     => $image,
+                                'product_id'=> $product['product_id'],
+                                'name'      => $product['name'],
+                                'quantity'  => $product['quantity'],
+                                'minimum'   => $product['minimum'],
+                                'price'     => $price,
+                                'special'   => $special,
+                                'weight'    => $weight,
+                                'total'     => $total,
+                                'href'      => $this->url->link('product/product', 'product_id=' . $product['product_id'])
+                            );
+                        }
+                    } else {
+                        if ($product['price'] > $price_deviation_min && $product['price'] < $price_deviation_max) {
+                            $json['products'][] = array(
+                                'thumb'     => $image,
+                                'product_id'=> $product['product_id'],
+                                'name'      => $product['name'],
+                                'quantity'  => $product['quantity'],
+                                'minimum'   => $product['minimum'],
+                                'price'     => $price,
+                                'special'   => $special,
+                                'weight'    => $weight,
+                                'total'     => $total,
+                                'href'      => $this->url->link('product/product', 'product_id=' . $product['product_id'])
+                            );
+                        }
+                    }
+                }
+
+                if (empty($json['products']) || count($json['products']) < 2) {
+                    $filter_data = array(
+                        'filter_category_id' => $category_id
+                    );
+
+                    $products = $this->model_extension_module_cart_popup_nik->getProducts($filter_data);
+
+                    foreach ($products as $product) {
+                        $product_info = $this->model_catalog_product->getProduct($product['product_id']);
+
+                        if ($product['image']) {
+                            $image = $this->model_tool_image->resize($product['image'], $this->config->get('theme_' . $this->config->get('config_theme') . '_image_cart_width'), $this->config->get('theme_' . $this->config->get('config_theme') . '_image_cart_height'));
+                        } else {
+                            $image = '';
+                        }
+
+                        if ($product_info['weight']) {
+                            $weight = $this->weight->format($product_info['weight'], $product_info['weight_class_id'], $this->language->get('decimal_point'), $this->language->get('thousand_point'));
+                        } else {
+                            $weight = '';
+                        }
+
+                        // Display prices
+                        if ($this->customer->isLogged() || !$this->config->get('config_customer_price')) {
+                            $unit_price = $this->tax->calculate($product['price'], $product['tax_class_id'], $this->config->get('config_tax'));
+
+                            if ((float)$product_info['special']) {
+                                $special = $this->currency->format($this->tax->calculate($product_info['special'], $product_info['tax_class_id'], $this->config->get('config_tax')), $this->session->data['currency']);
+                                $price = $this->currency->format($product_info['price'], $this->session->data['currency']);
+                                $total = $this->currency->format($product_info['price'] * $product['quantity'], $this->session->data['currency']);
+                            } else {
+                                $special = false;
+                                $price = $this->currency->format($unit_price, $this->session->data['currency']);
+                                $total = $this->currency->format($unit_price * $product['quantity'], $this->session->data['currency']);
+                            }
+                        } else {
+                            $price = false;
+                            $total = false;
+                            $special = false;
+                        }
+
+
+                        $json['products'][] = array(
+                            'thumb'     => $image,
+                            'product_id'=> $product['product_id'],
+                            'name'      => $product['name'],
+                            'quantity'  => $product['quantity'],
+                            'minimum'   => $product['minimum'],
+                            'price'     => $price,
+                            'special'   => $special,
+                            'weight'    => $weight,
+                            'total'     => $total,
+                            'href'      => $this->url->link('product/product', 'product_id=' . $product['product_id'])
+                        );
+                    }
+                }
             }
 
             $this->response->addHeader('Content-Type: application/json');
