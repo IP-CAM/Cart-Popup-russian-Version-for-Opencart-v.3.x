@@ -460,22 +460,20 @@
 
         $('.cart-popup').delegate('.remove-product-from-cart', 'click', function() {
             let productCartId = $(this).attr('data-cart-id');
-            updateCart(productCartId);
+            removeFromCart(productCartId)
+            setTimeout(function () {
+              updateCart();
+            }, 100);
         });
 
         function removeFromCart(productCartId) {
             cart.remove(productCartId);
         }
 
-        function updateCart(productCartId) {
+        function updateCart() {
             $.ajax({
                 url: "index.php?route=extension/module/cart_popup_nik/update",
                 type: "html",
-                beforeSend: function () {
-                    if(productCartId) {
-                        removeFromCart(productCartId);
-                    }
-                },
                 success: function (response) {
                     $('.cart-popup').html($(response).find('.cart-popup').html());
                 }
