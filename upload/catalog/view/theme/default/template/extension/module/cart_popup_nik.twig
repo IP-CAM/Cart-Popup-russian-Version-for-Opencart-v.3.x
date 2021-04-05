@@ -84,12 +84,13 @@
     .cart-popup .cart-popup-product-buttons {
       display: flex;
       flex-direction: row;
-      align-items: start;
+      align-items: center;
       padding: 0;
+      height: fit-content;
     }
     .cart-popup .cart-popup-product-buttons .counts {
-      width: 40px;
-      margin-right: 10px;
+      width: 30px;
+      /*margin-right: 10px;*/
     }
     .cart-popup .cart-popup-footer {
       width: 100%;
@@ -152,8 +153,8 @@
     }
     .remove-product-from-cart {
       margin-left: 5px;
+      font-size: 20px;
     }
-
     .cart-popup-replace-layout {
       width: 350px;
       z-index: 998;
@@ -201,6 +202,42 @@
       border-radius: 15px;
       color: #fff;
       margin-top: 5px;
+    }
+    .cart-popup-product-counts-field {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+      background-color: #E7E6E4;
+      padding: 5px;
+      border-radius: 25px;
+    }
+    .cart-popup-product-counts-field input {
+      background-color: transparent;
+      border: none;
+      text-align: center;
+      outline: none;
+    }
+    .cart-popup-product-counts-field input::-webkit-outer-spin-button,
+    .cart-popup-product-counts-field input::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+    .cart-popup-product-count-sign {
+      background-color: #fff;
+      border-radius: 50%;
+      width: 22px;
+      height: 22px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+    }
+    .cart-popup-product-count-sign::selection {
+      background: transparent;
+    }
+    .cart-popup-product-count-sign::-moz-selection {
+      background: transparent;
     }
   </style>
 
@@ -275,11 +312,15 @@
               </a>
               <div class="cart-popup-product-buttons col-xs-4">
                 {% if product.stock %}
-                  <input class="counts" min="1" data-cart-id="{{ product.cart_id }}" type="number" value="{{ product.quantity }}">
+                  <div class="cart-popup-product-counts-field">
+                    <span class="cart-popup-product-count-sign decrement">-</span>
+                    <input class="counts" min="1" data-cart-id="{{ product.cart_id }}" type="number" value="{{ product.quantity }}" />
+                    <span class="cart-popup-product-count-sign increment">+</span>
+                  </div>
                 {% else %}
                   <span class="replace-product-link" data-cart-id="{{ product.cart_id }}" data-product-id="{{ product.product_id }}">{{ text_replace_product }}</span>
                 {% endif %}
-                <span class="cursor-pointer remove-product-from-cart" data-cart-id="{{ product.cart_id }}" title="{{ button_remove }}">X</span>
+                <span class="cursor-pointer remove-product-from-cart" data-cart-id="{{ product.cart_id }}" title="{{ button_remove }}">&times;</span>
               </div>
             </div>
           {% endfor %}
@@ -354,6 +395,24 @@
 </div>
 <script>
     $(document).ready(function() {
+        $('.cart-popup').delegate('.decrement', 'click', function () {
+            // decrement
+            let counts = $(this).parent().find('.counts')
+            let countsVal = parseInt(counts.val())
+            countsVal--;
+            counts.val(countsVal)
+            $('.cart-popup-product-buttons .counts').change();
+        })
+
+        $('.cart-popup').delegate('.increment', 'click', function () {
+          // increment
+            let counts = $(this).parent().find('.counts')
+            let countsVal = parseInt(counts.val())
+            countsVal++;
+            counts.val(countsVal)
+            $('.cart-popup-product-buttons .counts').change();
+        })
+
         $('.cart-popup').delegate('.replace-product-link', 'click', function () {
             $('.cart-popup-replace-layout').addClass("show");
             let product_id = $(this).attr('data-product-id')
@@ -460,20 +519,22 @@
 
         $('.cart-popup').delegate('.remove-product-from-cart', 'click', function() {
             let productCartId = $(this).attr('data-cart-id');
-            removeFromCart(productCartId)
-            setTimeout(function () {
-              updateCart();
-            }, 100);
+            updateCart(productCartId);
         });
 
         function removeFromCart(productCartId) {
             cart.remove(productCartId);
         }
 
-        function updateCart() {
+        function updateCart(productCartId) {
             $.ajax({
                 url: "index.php?route=extension/module/cart_popup_nik/update",
                 type: "html",
+                beforeSend: function () {
+                    if(productCartId) {
+                        removeFromCart(productCartId);
+                    }
+                },
                 success: function (response) {
                     $('.cart-popup').html($(response).find('.cart-popup').html());
                 }
