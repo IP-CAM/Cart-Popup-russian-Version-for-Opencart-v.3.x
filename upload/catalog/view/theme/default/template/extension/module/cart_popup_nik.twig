@@ -90,7 +90,6 @@
     }
     .cart-popup .cart-popup-product-buttons .counts {
       width: 30px;
-      /*margin-right: 10px;*/
     }
     .cart-popup .cart-popup-footer {
       width: 100%;
@@ -193,8 +192,7 @@
       padding: 0;
     }
     .cart-popup-product-replace-buttons .counts {
-      width: 40px;
-      margin-right: 10px;
+      width: 30px;
     }
     .cart-popup-product-replace-buttons .cart-popup-buy-product {
       padding: 5px 15px;
@@ -273,23 +271,24 @@
               <p>{{ text_free_delivery_conditions }} <b>1500 P</b></p>
             </div>
           </div>
-          {% for product in products %}
-            <div class="cart-popup-product-row {% if not product.stock %}not-in-stock{% endif %}">
-              {% if product.thumb %}
-                <a href="{{ product.href }}" class="col-xs-3">
-                  <div class="cart-popup-product-image">
-                    <img src="{{ product.thumb }}" alt="{{ product.name }}" title="{{ product.name }}">
-                  </div>
-                </a>
-              {% endif %}
-              <a href="{{ product.href }}" class="col-xs-5">
-                <div class="cart-popup-product-info">
-                  <p>{{ product.name }}</p>
-                  <span class="weight">
+          <div class="cart-popup-products-list">
+            {% for product in products %}
+              <div class="cart-popup-product-row {% if not product.stock %}not-in-stock{% endif %}">
+                {% if product.thumb %}
+                  <a href="{{ product.href }}" class="col-xs-3">
+                    <div class="cart-popup-product-image">
+                      <img src="{{ product.thumb }}" alt="{{ product.name }}" title="{{ product.name }}">
+                    </div>
+                  </a>
+                {% endif %}
+                <a href="{{ product.href }}" class="col-xs-5">
+                  <div class="cart-popup-product-info">
+                    <p>{{ product.name }}</p>
+                    <span class="weight">
                     1 шт ({{ product.weight }})
                   </span>
-                  {% if product.stock %}
-                    <span class="price">
+                    {% if product.stock %}
+                      <span class="price">
                       {% if not product.special %}
                         <span class="current-price">
                           {{ product.price }}
@@ -303,27 +302,28 @@
                         </span>
                       {% endif %}
                     </span>
-                  {% else %}
-                    <span class="product-not-in-stock">
+                    {% else %}
+                      <span class="product-not-in-stock">
                     {{ text_product_out_of_stock }}
                   </span>
-                  {% endif %}
-                </div>
-              </a>
-              <div class="cart-popup-product-buttons col-xs-4">
-                {% if product.stock %}
-                  <div class="cart-popup-product-counts-field">
-                    <span class="cart-popup-product-count-sign decrement">-</span>
-                    <input class="counts" min="1" data-cart-id="{{ product.cart_id }}" type="number" value="{{ product.quantity }}" />
-                    <span class="cart-popup-product-count-sign increment">+</span>
+                    {% endif %}
                   </div>
-                {% else %}
-                  <span class="replace-product-link" data-cart-id="{{ product.cart_id }}" data-product-id="{{ product.product_id }}">{{ text_replace_product }}</span>
-                {% endif %}
-                <span class="cursor-pointer remove-product-from-cart" data-cart-id="{{ product.cart_id }}" title="{{ button_remove }}">&times;</span>
+                </a>
+                <div class="cart-popup-product-buttons col-xs-4">
+                  {% if product.stock %}
+                    <div class="cart-popup-product-counts-field">
+                      <span class="cart-popup-product-count-sign decrement">-</span>
+                      <input class="counts" min="1" data-cart-id="{{ product.cart_id }}" type="number" value="{{ product.quantity }}" />
+                      <span class="cart-popup-product-count-sign increment">+</span>
+                    </div>
+                  {% else %}
+                    <span class="replace-product-link" data-cart-id="{{ product.cart_id }}" data-product-id="{{ product.product_id }}">{{ text_replace_product }}</span>
+                  {% endif %}
+                  <span class="cursor-pointer remove-product-from-cart" data-cart-id="{{ product.cart_id }}" title="{{ button_remove }}">&times;</span>
+                </div>
               </div>
-            </div>
-          {% endfor %}
+            {% endfor %}
+          </div>
           {% for voucher in vouchers %}
             <tr>
               <td></td>
@@ -334,14 +334,14 @@
               <td class="text-right">{{ voucher.amount }}</td>
             </tr>
             <div class="cart-popup-product-row {% if not product.stock %}not-in-stock{% endif %}">
-                <div class="cart-popup-product-info col-xs-5">
-                  <p>{{ voucher.description }}</p>
-                  <span class="price">
+              <div class="cart-popup-product-info col-xs-5">
+                <p>{{ voucher.description }}</p>
+                <span class="price">
                     <span class="current-price">
                       {{ voucher.amount }}
                     </span>
                   </span>
-                </div>
+              </div>
               <div class="cart-popup-product-buttons col-xs-4">
                 <span class="cursor-pointer" onclick="voucher.remove('{{ voucher.key }}');" title="{{ button_remove }}">X</span>
               </div>
@@ -395,7 +395,7 @@
 </div>
 <script>
     $(document).ready(function() {
-        $('.cart-popup').delegate('.decrement', 'click', function () {
+        $('.cart-popup').delegate('.cart-popup-products-list .decrement', 'click', function () {
             // decrement
             let counts = $(this).parent().find('.counts')
             let countsVal = parseInt(counts.val())
@@ -404,13 +404,27 @@
             $('.cart-popup-product-buttons .counts').change();
         })
 
-        $('.cart-popup').delegate('.increment', 'click', function () {
-          // increment
+        $('.cart-popup').delegate('.cart-popup-products-list .increment', 'click', function () {
+            // increment
             let counts = $(this).parent().find('.counts')
             let countsVal = parseInt(counts.val())
             countsVal++;
             counts.val(countsVal)
             $('.cart-popup-product-buttons .counts').change();
+        })
+
+        $('.cart-popup').delegate('.cart-popup-replace-layout-inner-container .decrement', 'click', function () {
+            let counts = $(this).parent().find('.counts')
+            let countsVal = parseInt(counts.val())
+            countsVal--;
+            counts.val(countsVal)
+        })
+
+        $('.cart-popup').delegate('.cart-popup-replace-layout-inner-container .increment', 'click', function () {
+            let counts = $(this).parent().find('.counts')
+            let countsVal = parseInt(counts.val())
+            countsVal++;
+            counts.val(countsVal)
         })
 
         $('.cart-popup').delegate('.replace-product-link', 'click', function () {
@@ -445,42 +459,46 @@
 
                 if (products['products'][i].thumb) {
                     html += '<a href="' + products['products'][i].href + '" class="col-xs-3">\n' +
-                              '<div class="cart-popup-product-image">\n' +
-                                '<img src="' + products['products'][i].thumb + '" alt="' + products['products'][i].name + '" title="' + products['products'][i].name + '">\n' +
-                              '</div>\n' +
-                            '</a>\n';
+                        '<div class="cart-popup-product-image">\n' +
+                        '<img src="' + products['products'][i].thumb + '" alt="' + products['products'][i].name + '" title="' + products['products'][i].name + '">\n' +
+                        '</div>\n' +
+                        '</a>\n';
                 }
 
                 html += '      <a href="' + products['products'][i].href + '" class="col-xs-5">\n' +
-                        '         <div class="cart-popup-product-info">\n' +
-                        '            <p>' + products['products'][i].name + '</p>\n' +
-                        '               <span class="weight">\n' +
-                        '                  1 шт (' + products['products'][i].weight + ')\n' +
-                        '               </span>\n' +
-                        '                    <span class="price">\n';
+                    '         <div class="cart-popup-product-info">\n' +
+                    '            <p>' + products['products'][i].name + '</p>\n' +
+                    '               <span class="weight">\n' +
+                    '                  1 шт (' + products['products'][i].weight + ')\n' +
+                    '               </span>\n' +
+                    '                    <span class="price">\n';
 
                 if (!products['products'][i].special) {
                     html += '                        <span class="current-price">\n' +
-                                                        products['products'][i].price +
-                            '                        </span>\n';
+                        products['products'][i].price +
+                        '                        </span>\n';
                 } else {
                     html += '                    <span class="current-price">\n' +
-                                                    products['products'][i].special +
+                        products['products'][i].special +
                         '                        </span>\n' +
                         '                        <span class="old-price">\n' +
-                                                    products['products'][i].price +
+                        products['products'][i].price +
                         '                        </span>\n';
                 }
 
                 html += '                    </span>\n' +
-                        '                </div>\n' +
-                        '              </a>\n';
+                    '                </div>\n' +
+                    '              </a>\n';
 
                 html += '              <div class="cart-popup-product-replace-buttons col-xs-4">\n' +
-                        '                  <input class="counts" min="1" data-cart-id="" type="number" value="' + products['products'][i].minimum + '">\n' +
-                        '                  <span class="cursor-pointer cart-popup-buy-product" data-replace-cart-id="' + replace_cart_id + '" data-product-id="' + products['products'][i].product_id + '">{{ button_buy }}</span>\n' +
-                        '              </div>\n' +
-                        '            </div>'
+                    '                  <div class="cart-popup-product-counts-field">\n' +
+                    '                     <span class="cart-popup-product-count-sign decrement">-</span>\n' +
+                    '                     <input class="counts" min="1" data-cart-id="" type="number" value="' + products['products'][i].minimum + '" />\n' +
+                    '                     <span class="cart-popup-product-count-sign increment">+</span>\n' +
+                    '                  </div>' +
+                    '                  <span class="cursor-pointer cart-popup-buy-product" data-replace-cart-id="' + replace_cart_id + '" data-product-id="' + products['products'][i].product_id + '">{{ button_buy }}</span>\n' +
+                    '              </div>\n' +
+                    '            </div>'
 
                 html += '</div>'
             }
@@ -519,22 +537,20 @@
 
         $('.cart-popup').delegate('.remove-product-from-cart', 'click', function() {
             let productCartId = $(this).attr('data-cart-id');
-            updateCart(productCartId);
+            removeFromCart(productCartId)
+            setTimeout(function () {
+                updateCart()
+            }, 100);
         });
 
         function removeFromCart(productCartId) {
             cart.remove(productCartId);
         }
 
-        function updateCart(productCartId) {
+        function updateCart() {
             $.ajax({
                 url: "index.php?route=extension/module/cart_popup_nik/update",
                 type: "html",
-                beforeSend: function () {
-                    if(productCartId) {
-                        removeFromCart(productCartId);
-                    }
-                },
                 success: function (response) {
                     $('.cart-popup').html($(response).find('.cart-popup').html());
                 }
