@@ -88,6 +88,18 @@ class ControllerExtensionModuleCartPopupNik extends Controller {
                 $special = false;
             }
 
+            $this->load->model('catalog/category');
+            $this->load->model('catalog/product');
+            $getCategories = $this->model_catalog_product->getCategories($product['product_id']);
+            $category = array_shift($getCategories);
+            $category_info = $this->model_catalog_category->getCategoryPath($category['category_id']);
+
+            if ($category_info['path_id'] != $category_info['category_id']) {
+                $product_link = $this->url->link('product/product', 'path=' . $category_info['path_id'] . '_' . $category_info['category_id'] . '&product_id=' . $product['product_id']);
+            } else {
+                $product_link = $this->url->link('product/product', 'path=' . $category_info['category_id'] . '&product_id=' . $product['product_id']);
+            }
+
             $data['products'][] = array(
                 'cart_id'   => $product['cart_id'],
                 'thumb'     => $image,
@@ -103,7 +115,7 @@ class ControllerExtensionModuleCartPopupNik extends Controller {
                 'special'   => $special,
                 'weight'    => $weight,
                 'total'     => $total,
-                'href'      => $this->url->link('product/product', 'product_id=' . $product['product_id'])
+                'href'      => $product_link
             );
             if (!$product['stock']) {
                 $not_in_stock++;
@@ -275,6 +287,18 @@ class ControllerExtensionModuleCartPopupNik extends Controller {
                         $special = false;
                     }
 
+                    $this->load->model('catalog/category');
+                    $this->load->model('catalog/product');
+                    $getCategories = $this->model_catalog_product->getCategories($product['product_id']);
+                    $category = array_shift($getCategories);
+                    $category_info = $this->model_catalog_category->getCategoryPath($category['category_id']);
+
+                    if ($category_info['path_id'] != $category_info['category_id']) {
+                        $product_link = $this->url->link('product/product', 'path=' . $category_info['path_id'] . '_' . $category_info['category_id'] . '&product_id=' . $product['product_id']);
+                    } else {
+                        $product_link = $this->url->link('product/product', 'path=' . $category_info['category_id'] . '&product_id=' . $product['product_id']);
+                    }
+
                     if ($product['special']) {
                         if ($product['special'] > $price_deviation_min && $product['special'] < $price_deviation_max) {
                             $json['products'][] = array(
@@ -287,7 +311,7 @@ class ControllerExtensionModuleCartPopupNik extends Controller {
                                 'special'   => $special,
                                 'weight'    => $weight,
                                 'total'     => $total,
-                                'href'      => $this->url->link('product/product', 'product_id=' . $product['product_id'])
+                                'href'      => $product_link
                             );
                         }
                     } else {
@@ -302,7 +326,7 @@ class ControllerExtensionModuleCartPopupNik extends Controller {
                                 'special'   => $special,
                                 'weight'    => $weight,
                                 'total'     => $total,
-                                'href'      => $this->url->link('product/product', 'product_id=' . $product['product_id'])
+                                'href'      => $product_link
                             );
                         }
                     }
@@ -348,6 +372,18 @@ class ControllerExtensionModuleCartPopupNik extends Controller {
                         $special = false;
                     }
 
+                    $this->load->model('catalog/category');
+                    $this->load->model('catalog/product');
+                    $getCategories = $this->model_catalog_product->getCategories($product['product_id']);
+                    $category = array_shift($getCategories);
+                    $category_info = $this->model_catalog_category->getCategoryPath($category['category_id']);
+
+                    if ($category_info['path_id'] != $category_info['category_id']) {
+                        $product_link = $this->url->link('product/product', 'path=' . $category_info['path_id'] . '_' . $category_info['category_id'] . '&product_id=' . $product['product_id']);
+                    } else {
+                        $product_link = $this->url->link('product/product', 'path=' . $category_info['category_id'] . '&product_id=' . $product['product_id']);
+                    }
+
                     if ($product['special']) {
                         if ($product['special'] > $price_deviation_min && $product['special'] < $price_deviation_max) {
                             $json['products'][] = array(
@@ -360,7 +396,7 @@ class ControllerExtensionModuleCartPopupNik extends Controller {
                                 'special'   => $special,
                                 'weight'    => $weight,
                                 'total'     => $total,
-                                'href'      => $this->url->link('product/product', 'product_id=' . $product['product_id'])
+                                'href'      => $product_link
                             );
                         }
                     } else {
@@ -375,7 +411,7 @@ class ControllerExtensionModuleCartPopupNik extends Controller {
                                 'special'   => $special,
                                 'weight'    => $weight,
                                 'total'     => $total,
-                                'href'      => $this->url->link('product/product', 'product_id=' . $product['product_id'])
+                                'href'      => $product_link
                             );
                         }
                     }
@@ -422,6 +458,17 @@ class ControllerExtensionModuleCartPopupNik extends Controller {
                             $special = false;
                         }
 
+                        $this->load->model('catalog/category');
+                        $this->load->model('catalog/product');
+                        $getCategories = $this->model_catalog_product->getCategories($product['product_id']);
+                        $category = array_shift($getCategories);
+                        $category_info = $this->model_catalog_category->getCategoryPath($category['category_id']);
+
+                        if ($category_info['path_id'] != $category_info['category_id']) {
+                            $product_link = $this->url->link('product/product', 'path=' . $category_info['path_id'] . '_' . $category_info['category_id'] . '&product_id=' . $product['product_id']);
+                        } else {
+                            $product_link = $this->url->link('product/product', 'path=' . $category_info['category_id'] . '&product_id=' . $product['product_id']);
+                        }
 
                         $json['products'][] = array(
                             'thumb'     => $image,
@@ -433,7 +480,7 @@ class ControllerExtensionModuleCartPopupNik extends Controller {
                             'special'   => $special,
                             'weight'    => $weight,
                             'total'     => $total,
-                            'href'      => $this->url->link('product/product', 'product_id=' . $product['product_id'])
+                            'href'      => $product_link
                         );
                     }
                 }
