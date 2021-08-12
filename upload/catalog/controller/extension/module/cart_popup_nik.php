@@ -91,13 +91,39 @@ class ControllerExtensionModuleCartPopupNik extends Controller {
             $this->load->model('catalog/category');
             $this->load->model('catalog/product');
             $getCategories = $this->model_catalog_product->getCategories($product['product_id']);
-            $category = array_shift($getCategories);
-            $category_info = $this->model_catalog_category->getCategoryPath($category['category_id']);
+            $path = '';
 
-            if ($category_info['path_id'] != $category_info['category_id']) {
-                $product_link = $this->url->link('product/product', 'path=' . $category_info['path_id'] . '_' . $category_info['category_id'] . '&product_id=' . $product['product_id']);
+            $categoriesPaths = array();
+            $max_count = 0;
+            foreach ($getCategories as $getCategory) {
+                $categoriesPaths[] = $this->model_catalog_category->getCategoryPathHighestLevel($getCategory['category_id']);
+            }
+            foreach ($categoriesPaths as $categoriesPath) {
+                if ($max_count < count($categoriesPath)) {
+                    $max_count = count($categoriesPath);
+                }
+            }
+            foreach ($categoriesPaths as $key => $categoriesPath) {
+                if ($max_count > count($categoriesPath)) {
+                    unset($categoriesPaths[$key]);
+                }
+            }
+            if (!empty($categoriesPaths)) {
+                $currentCategoryPaths = min($categoriesPaths);
+
+                foreach ($currentCategoryPaths as $kk => $currentCategoryPath) {
+                    if ($kk != (count($currentCategoryPaths) - 1)) {
+                        $path .= $currentCategoryPath['path_id'] . '_';
+                    } else {
+                        $path .= $currentCategoryPath['path_id'];
+                    }
+                }
+            }
+
+            if(!empty($path)) {
+                $product_link = $this->url->link('product/product', 'path=' . $path . '&product_id=' . $product['product_id']);
             } else {
-                $product_link = $this->url->link('product/product', 'path=' . $category_info['category_id'] . '&product_id=' . $product['product_id']);
+                $product_link = $this->url->link('product/product', 'product_id=' . $product['product_id']);
             }
 
             $data['products'][] = array(
