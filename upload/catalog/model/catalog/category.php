@@ -69,7 +69,7 @@ class ModelCatalogCategory extends Model {
 
     // Function for get all categories path
     public function getCategoryPathHighestLevel($category_id) {
-        $query = $this->db->query("SELECT * FROM " . DB_PREFIX . "category_path WHERE category_id = '" . (int)$category_id . "' ORDER BY `category_id`");
+        $query = $this->db->query("SELECT * FROM " . DB_PREFIX . "category_path WHERE category_id = '" . (int)$category_id . "' ORDER BY `level`, `path_id`");
 
         return $query->rows;
     }
